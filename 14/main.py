@@ -1,3 +1,5 @@
+from collections import Counter
+
 inputFile = open("input.txt", "r")
 parsed = []
 
@@ -20,45 +22,31 @@ polymer = []
 for char in polym:
 	polymer.append(char)
 
+pairs = []
+index = 0
+for i in polymer:
+	if index == len(polymer)-1: break
+	pairs.append(i+polymer[index+1])
+	index += 1
+
+pairs = Counter(pairs)
 
 for iteration in range(40):
-	pairs = []
-	index = 0
-	for i in polymer:
-		if index == len(polymer)-1: break
-		pairs.append(i+polymer[index+1])
-		index += 1
+	res = Counter()
+	for pair, value in pairs.items():
+		res[list(pair)[0]+map[pair]] += value
+		res[map[pair]+list(pair)[1]] += value
 
-	insertions = 0
-	initialLen = len(polymer)
-	for index in range(len(polymer)):
-		if index == initialLen-1:
-			break
-
-		pair = pairs[insertions]
-		polymer.insert(index+1+insertions, map[pair])
-		insertions += 1
-		
-
-def most_frequent(List):
-    counter = 0
-    num = List[0]
-     
-    for i in List:
-        curr_frequency = List.count(i)
-        if(curr_frequency> counter):
-            counter = curr_frequency
-            num = i
- 
-    return num
-
-def least_frequent(List):
-	from collections import Counter
-	res = Counter(List)
-	return res.most_common()[-1][0]
+	pairs = res
 
 
-most = most_frequent(polymer)
-least = least_frequent(polymer)
+res = Counter()
+for pair, value in pairs.items():
+	res[list(pair)[0]] += value
+	res[list(pair)[1]] += value
 
-print(polymer.count(most)-polymer.count(least))
+most = res.most_common(1)[0][0]
+least = res.most_common()[-1][0]
+
+import math
+print(math.ceil((res[most]-res[least])/2))
